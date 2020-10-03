@@ -35,9 +35,6 @@ class Automaton(object):
     def ext_d(self, qi, string):
         """Extended transition function. Recursive implementation"""
         # BASE CASES
-        if (qi == 'null'):
-            # checking for sink state
-            return 'null'
         if len(string) == 0:
             # empty string
             return qi

@@ -11,4 +11,4 @@ import Minimizer
 DFA = Automaton(*readFile("test1.txt"))        # the * operator separates the list into separate arguments
 print(DFA)
 
-DFA.process("a")
+DFA.process("ababa")
