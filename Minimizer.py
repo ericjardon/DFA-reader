@@ -1,14 +1,17 @@
 from collections import defaultdict
 from pprint import pprint
 # The transition table of an Automaton is a dictionary of state-keys, each row represented by a subdictionary of symbol:result pairs.
-# The Automaton table is a states-to-row mapping.
-# # To find equivalent states we need to find states that are of the same type (final or non final) and share the same row value.
-# We need to flip the dictionary into a row-to-states mapping.
+# The Automaton table is a state-to-row mapping.
+# # To find equivalent states we need to find states that are of the same type (final or non final) and who share the same row transitions.
+# Solution is to flip our dictionary into a row-to-states mapping
 
 class Minimizer():
-    def __init__(self, Automaton):
+    def __init__(self):
         self.ch = 'A'
-        self.Automaton = Automaton
+        self.Automaton = None
+
+    def get_Automaton(self):
+        return self.Automaton
 
     def set_Automaton(self, Automaton):
         self.Automaton = Automaton
@@ -17,40 +20,39 @@ class Minimizer():
         self.ch = 'A'
 
     def minimize(self):
-        """Receives an automaton.
-            Does the full minimization of Automaton, modifying its table, initial and final states"""
-        while True:
+        """Does the full minimization of the stored Automaton, directly modifying its table, initial and final states"""
+        while self.Automaton.isMinimized == False:
             flipped, repeated = self.flip(self.Automaton.table)
-            pprint(flipped)
             if len(repeated) == 0:
                 print("No rows are repeated. finish")
                 pprint(self.Automaton.table)
-                break
+                self.Automaton.isMinimized = True
+                # break
             else:
                 redundant = False
-                for key in list(flipped):
-                # go through all keys of flipped, checking if there is >1 state with that row value (same transitions).
-                    if len(flipped[key]) > 1:
-                        print("Row " + key + " of table has redundant states: " + str(flipped[key]))
-                        # separate the redundant states into final and non-final states
-                        final = []
-                        nonfinal = []
-                        for state in flipped[key]:
-                            if state in self.Automaton.final:
-                                final.append(state)
-                            else:
-                                nonfinal.append(state)
-                        # Collapse equivalent states that are final
-                        if len(final)>1:
-                            self.collapse_rows(final, True)
-                            redundant = True
-                        # Collapse equivalent states that are non-final
-                        if len(nonfinal)>1:
-                            self.collapse_rows(nonfinal, False)
-                            redundant = True
+                for key in repeated:
+                # iterate over the repeated rows, checking if there is >1 state with that row value (same transitions).
+                    print("States " + str(flipped[key]) + " have the same row: " + key)
+                    # separate the redundant states into final and non-final states
+                    final = []
+                    nonfinal = []
+                    for state in flipped[key]:
+                        if state in self.Automaton.final:
+                            final.append(state)
+                        else:
+                            nonfinal.append(state)
+                    # Collapse equivalent states that are final
+                    if len(final)>1:
+                        self.collapse_rows(final, True)
+                        redundant = True
+                    # Collapse equivalent states that are non-final
+                    if len(nonfinal)>1:
+                        self.collapse_rows(nonfinal, False)
+                        redundant = True
             if not redundant:
                 print("No equivalent states left. Finish")
-                break
+                self.Automaton.isMinimized = True
+                # break
 
 
     def flip(self, table):
@@ -75,14 +77,15 @@ class Minimizer():
 
         return dict(flipped), repeatedRows
 
-    def collapse_rows(self, states, areFinal):
+    def collapse_rows(self, r_states, areFinal):
         """Receives an array of redundant states,
             replaces all their rows with a single row,
             renames their occurrences in the automaton's table"""
-        rowValues = self.Automaton.table[states[0]]
-        rename = 'q_' + self.ch
+        rowValues = self.Automaton.table[r_states[0]]
+        rename = 'q' + self.ch
+        print("Rename " + str(r_states) + " --> " + rename)
         self.ch = chr(ord(self.ch) + 1)
-        for rs in states:
+        for rs in r_states:
             # delete all redundant key:value pairs
             del self.Automaton.table[rs]
 
@@ -92,16 +95,25 @@ class Minimizer():
         # Rename all occurrences of redundant states in the remaining table rows
         for key, subdict in self.Automaton.table.items():
             for symbol, result in subdict.items():
-                if result in states:
+                if result in r_states:
                     subdict[symbol] = rename
 
-        # Update initial state if necessary
-        if self.Automaton.initial in states:
+        print("Update redundant states " + str(r_states))
+        print("Final: " + str(self.Automaton.final))
+        # Rename initial state if necessary
+        if self.Automaton.initial in r_states:
             self.Automaton.initial = rename
 
         # Update final states if necessary
         if (areFinal):
-            for f in self.Automaton.final:
-                if f in states:
-                    self.Automaton.final.remove(f)
+            for rs in r_states:
+                if rs in self.Automaton.final:
+                    self.Automaton.final.remove(rs)
             self.Automaton.final.append(rename)
+
+        self.updateStates()
+
+    def updateStates(self):
+        self.Automaton.states = []
+        for key in list(self.Automaton.table):
+            self.Automaton.states.append(key)
