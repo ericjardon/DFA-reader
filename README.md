@@ -9,7 +9,7 @@ Eric Andrés Jardón Chao A01376748
  from a text file and generates the corresponding Deterministic Finite Automaton.  
  Then it can also determine whether a given string is accepted or not by the DFA.   
  
-###_Modules_:  
+### _Modules_:  
 - FileReader: A functional-based module that contains functions for reading a text file given its name, 
 and returns an instance of an Automaton given the information provided in the file's lines.
 - Automaton: A class-based module that represents a Deterministic Finite Automaton.
