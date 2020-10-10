@@ -7,7 +7,7 @@ from pprint import pprint
 
 class Minimizer():
     def __init__(self):
-        self.ch = 'A'
+        self.ch = None
         self.Automaton = None
 
     def get_Automaton(self):
@@ -19,7 +19,9 @@ class Minimizer():
     def restart_counter(self):
         self.ch = 'A'
 
-    def minimize(self):
+    def minimize(self, Automaton):
+        self.set_Automaton(Automaton)
+        self.restart_counter()
         """Does the full minimization of the stored Automaton, directly modifying its table, initial and final states"""
         while self.Automaton.isMinimized == False:
             flipped, repeated = self.flip(self.Automaton.table)
@@ -54,6 +56,8 @@ class Minimizer():
                 self.Automaton.isMinimized = True
                 # break
 
+        return self.Automaton
+
 
     def flip(self, table):
         # flipped is a dictionary: {'qaqb': ['q0','q1',...'qn']} that shows the states with the same transition row
@@ -74,7 +78,7 @@ class Minimizer():
                 # the row is repeated in more than one state
                 flipped[rowKey].append(key)
                 repeatedRows.append(rowKey)
-
+                
         return dict(flipped), repeatedRows
 
     def collapse_rows(self, r_states, areFinal):
@@ -98,8 +102,7 @@ class Minimizer():
                 if result in r_states:
                     subdict[symbol] = rename
 
-        print("Update redundant states " + str(r_states))
-        print("Final: " + str(self.Automaton.final))
+        print("Udating redundant states " + str(r_states))
         # Rename initial state if necessary
         if self.Automaton.initial in r_states:
             self.Automaton.initial = rename

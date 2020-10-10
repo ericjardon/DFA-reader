@@ -1,5 +1,4 @@
 class Automaton(object):
-    # this class is not finished yet.
     def __init__(self, states, symbols, table, initial, final):
         """states is an array, set of states of M
             symbols is an array, the alphabet of M

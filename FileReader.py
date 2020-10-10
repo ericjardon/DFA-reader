@@ -1,4 +1,5 @@
 import re
+from Automaton import Automaton
 # This module contains the functions for reading the text file
 # and retrieving the Automaton info in a functional approach.
 
@@ -46,4 +47,4 @@ def readFile(filename):
 
     f.close()
 
-    return (states, alphabet, table, initial, final)
+    return Automaton(states, alphabet, table, initial, final) # return an Automaton
