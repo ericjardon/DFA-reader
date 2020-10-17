@@ -20,12 +20,13 @@ class Automaton(object):
         """Takes in a string, uses the extended transition function to process it.
             May print out the result to console. Lines are commented out for cleaning purposes.
             Returns a boolean indicating whether the given string is accepted by the DFA or not."""
+        print ("String to process : ", string, " from initial: ", self.initial, " ")
         res = self.ext_d(self.initial, string)
 
         accepted = "" if (res in self.final)  else "NOT"
         print("M: d*(%s, %s) = %s" % (self.initial, string, res))
         print("The string is %s accepted" % accepted)
-
+        
         return res in self.final
 
 
@@ -37,12 +38,12 @@ class Automaton(object):
             # By design of our transition table, a 'null' value indicates a sink state.
             return 'null'
         else:
+            print ("Current state: ", qi, " to process ", symbol, " --> ", self.table[qi][symbol])
             return self.table[qi][symbol]
 
     def ext_d(self, qi, string):
         """Extended Transition Function based on its recursive definition.
             Takes in a state, the string to process from that state, and recursively decomposes it"""
-
         # BASE CASES: empty string or single character
         if len(string) == 0:
             return qi
